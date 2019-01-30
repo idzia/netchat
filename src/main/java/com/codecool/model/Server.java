@@ -1,34 +1,44 @@
 package com.codecool.model;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
 
 public class Server {
+
     public static void main(String[] args) {
-        if (args.length<1) {
-            return;
-        }
+        if (args.length < 1) return;
 
         int port = Integer.parseInt(args[0]);
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Waiting for a client on port: " + port);
-            while (true) {
 
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+
+            System.out.println("Server is listening on port " + port);
+
+            while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
 
+
                 OutputStream output = socket.getOutputStream();
                 PrintWriter writer = new PrintWriter(output, true);
-
                 writer.println("I am happy that you joined to us");
 
+                Scanner scanner = new Scanner(System.in);
+                String text;
+
+                do {
+                    text = scanner.nextLine();
+                    writer.println("Server: " + text);
+
+                } while (!text.equals("exit"));
+
+                socket.close();
             }
 
-        } catch (IOException e) {
-            System.out.println("During creating the socket occurred i/o error");
+        } catch (IOException ex) {
+            System.out.println("Server exception: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 }
