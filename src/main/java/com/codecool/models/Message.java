@@ -1,4 +1,4 @@
-package com.codecool.model;
+package com.codecool.models;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

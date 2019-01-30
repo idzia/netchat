@@ -1,10 +1,10 @@
-package com.codecool.model;
+package com.codecool.trash;
 
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
-public class Server {
+public class Server2 {
 
     public static void main(String[] args) {
         if (args.length < 1) return;
@@ -19,19 +19,25 @@ public class Server {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
 
-
                 OutputStream output = socket.getOutputStream();
                 PrintWriter writer = new PrintWriter(output, true);
-                writer.println("I am happy that you joined to us");
+//                writer.println("I am happy that you joined to us");
+
+                InputStream input = socket.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
                 Scanner scanner = new Scanner(System.in);
-                String text;
+                String toClient;
+                String fromClient;
 
                 do {
-                    text = scanner.nextLine();
-                    writer.println("Server: " + text);
+                    toClient = scanner.nextLine();
+                    writer.println("Server: " + toClient);
 
-                } while (!text.equals("exit"));
+                    fromClient = reader.readLine();
+                    System.out.println("Client: " + fromClient);
+
+                } while (!toClient.equals("exit"));
 
                 socket.close();
             }
