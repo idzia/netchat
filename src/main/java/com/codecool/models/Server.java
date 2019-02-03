@@ -22,19 +22,16 @@ public class Server extends Mode {
 
             System.out.println("You can start chat:");
 
-
-            String receiveMessage = "";
-            String sendMessage = "";
-
-            while (!sendMessage.equals("exit")) {
-                sendMessage = handleSendMessage(prepareMessage, sendMessage);
-                receiveMessage = handleReceiveMessage(incomingMessage, receiveMessage);
-
+            while (true) {
+                handleReceiveMessage(input);
+                handleSendMessage(output);
             }
 
         } catch (IOException ex) {
             System.out.println("Server exception: " + ex.getMessage());
             ex.printStackTrace();
+        } catch (InterruptedException e ){
+            System.out.println("bleee");
         }
     }
 }

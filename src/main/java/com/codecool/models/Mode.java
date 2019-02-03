@@ -3,7 +3,7 @@ package com.codecool.models;
 import com.codecool.controlleres.InputHandler;
 import com.codecool.controlleres.OutputHandler;
 
-import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -13,8 +13,6 @@ public abstract class Mode implements Runnable{
     protected String hostname;
     protected InputHandler input;
     protected OutputHandler output;
-    protected BufferedReader incomingMessage;
-    protected BufferedReader prepareMessage;
 
     public Mode(String hostname, int port) {
         this.port = port;
@@ -32,43 +30,52 @@ public abstract class Mode implements Runnable{
 
             System.out.println("You can start chat ");
 
-            String receiveMessage = "";
-            String sendMessage = "";
+            while (true) {
+                handleReceiveMessage(input);
+                handleSendMessage(output);
 
-            while (!sendMessage.equals("exit")) {
-                sendMessage = handleSendMessage(prepareMessage, sendMessage);
-                receiveMessage = handleReceiveMessage(incomingMessage, receiveMessage);
             }
 
         } catch (IOException ex) {
             System.out.println("Server exception: " + ex.getMessage());
             ex.printStackTrace();
+        } catch (InterruptedException e ){
+            System.out.println("bleee");
         }
     }
 
     protected void handlersInitializer(Socket socket) throws IOException {
-        input = new InputHandler(socket);
-        output = new OutputHandler(socket);
+        String name = Thread.currentThread().getName();
+        input = new InputHandler(name, socket);
+        output = new OutputHandler(name, socket);
         input.start();
         output.start();
-        incomingMessage = input.getIncomingMessage();
-        prepareMessage = output.getPrepareMessage();
     }
 
-    protected String handleSendMessage(BufferedReader prepareMessage, String sendMessage) throws IOException {
-        if (prepareMessage != null) {
-            sendMessage = prepareMessage.readLine();
-            System.out.println(sendMessage);
+    protected void handleSendMessage(OutputHandler output) throws InterruptedException{
+        Message sendMessage;
+//        Thread.sleep(1000);
+        if (output.getMessage() != null) {
+
+            sendMessage = output.getMessage();
+
+            System.out.println("mode send message: "+sendMessage.toString());
+//
+            output.resetMessage();
         }
-        return sendMessage;
+
     }
 
-    protected String handleReceiveMessage(BufferedReader incomingMessage, String receiveMessage) throws IOException {
-        if (incomingMessage!=null){
-            receiveMessage = incomingMessage.readLine();
-            System.out.println(receiveMessage);
+    protected void handleReceiveMessage(InputHandler input) throws InterruptedException{
+        Message receiveMessage;
+//    Thread.sleep(1000);
+        if (input.getIncomingMessage()!=null) {
+
+            receiveMessage = input.getIncomingMessage();
+            System.out.println("mode receive message: "+receiveMessage.toString());
+            input.resetMessage();
         }
-        return receiveMessage;
+
     }
 
 

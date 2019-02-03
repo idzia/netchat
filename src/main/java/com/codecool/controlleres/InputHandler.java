@@ -1,5 +1,7 @@
 package com.codecool.controlleres;
 
+import com.codecool.models.Message;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -7,9 +9,12 @@ public class InputHandler extends Thread {
 
     private Socket socket;
     private InputStream input;
-    private BufferedReader incomingMessage;
+    private ObjectInputStream incomingMessage;
+    private Message message;
+    private boolean isDone;
 
-    public InputHandler(Socket socket) throws IOException {
+    public InputHandler(String name, Socket socket) throws IOException {
+        super(name);
         this.socket = socket;
         this.input = socket.getInputStream();
     }
@@ -17,22 +22,33 @@ public class InputHandler extends Thread {
     public void run() {
         try {
 
-            String receiveMessage;
+            incomingMessage = new ObjectInputStream(input);
 
             while (true) {
-                incomingMessage = new BufferedReader(new InputStreamReader(input));
+                if (incomingMessage != null) {
 
-                if ((receiveMessage = incomingMessage.readLine()) != null) {
-                    System.out.println(receiveMessage);
+                    message = (Message) incomingMessage.readObject();
+
                 }
+
             }
+
         } catch (IOException e) {
             System.out.println("exception InputHandler");
+        } catch (ClassNotFoundException e) {
+            System.out.println("I can not found appropriate class");
         }
     }
 
-    public BufferedReader getIncomingMessage() {
-        return this.incomingMessage;
+    public Message getIncomingMessage() {
+        return message;
     }
 
+    public void resetMessage() {
+        this.message = null;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
 }

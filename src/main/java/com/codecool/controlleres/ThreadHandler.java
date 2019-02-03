@@ -6,14 +6,13 @@ import com.codecool.models.Server;
 
 public class ThreadHandler {
 
+
     public ThreadHandler(String[] args) {
         netChatHandle(args);
     }
 
     public void netChatHandle(String[] args) {
         String mode = args[0];
-        String hostname;
-        int port;
 
         switch (mode.toLowerCase()) {
             case "client" :
@@ -21,11 +20,7 @@ public class ThreadHandler {
                     System.out.println("not enough arguments");
                     return;
                 }
-                hostname = args[1];
-                port = Integer.parseInt(args[2]);
-                Mode client = new Client(hostname, port);
-                Thread clientThread = new Thread(client, "client");
-                clientThread.start();
+                clientSocketInitializer(args);
                 break;
 
             case "server" :
@@ -33,14 +28,26 @@ public class ThreadHandler {
                     System.out.println("not enough arguments");
                     return;
                 }
-                port = Integer.parseInt(args[1]);
-                Mode server = new Server(port);
-                Thread serverThread = new Thread(server, "server");
-                serverThread.start();
+                serverSocketInitializer(args);
 
                 break;
             default:
                 System.out.println("There is no this kind of mode");
         }
+    }
+
+    private void serverSocketInitializer(String[] args) {
+        int port = Integer.parseInt(args[1]);
+        Mode server = new Server(port);
+        Thread serverThread = new Thread(server, "server");
+        serverThread.start();
+    }
+
+    private void clientSocketInitializer(String[] args) {
+        String hostname = args[1].toLowerCase();
+        int port = Integer.parseInt(args[2]);
+        Mode client = new Client(hostname, port);
+        Thread clientThread = new Thread(client, "client");
+        clientThread.start();
     }
 }
